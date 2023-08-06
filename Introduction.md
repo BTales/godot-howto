@@ -85,8 +85,27 @@ A scene itself also inherits from Node, so that a scene may contain another scen
 
 When a scene is loaded and activated, each node of its node tree will be instantiated.
 
-One or many .gd scripts may be attached to a node. Each script describes a class of its own and one instance will be
-automatically created as soon as the node is instantiated. It lives as a property of the containing node.
+The programmer may attach exactly one .gd script to a node. In the editor, this can be achieved using the Scene's 
+context menu->"Attach Script" or be filling the 'script' property of the node with a resource path. 
+Attaching a script in fact simply extends the node's class (e.g. "Sprite2D") by way of inheritance. When instantiating
+the node, the extended class definition will be used rather than the parent class definition. Thus, from the script's code
+the keyword 'self' refers to an instance of the extended node itself.
+
+It was a bit confusing for me, that the extension script may also have an 'extend' statement. This statement does *not* 
+represent multiple inheritance as it may seem, but simply denotes which part of the nodes's inherited resources are available
+for the extending code. 
+Note: The extend statement limits the usability of the script's code to nodes, which extend the same class (or one of its parents)! To give an example: if a script extents Node3D, it cannot be attached to a node extending Node2D (because Node2D 
+does not extend Node3D). If this is wrong, the Godot editor will show an error.
+
+When attaching a script to a scene, a reference to script is stored as ext_resource in the scene's .tcsn file.
+
+After a script is attached, it may also be 'extended' by a .gd script via the editor's context menu, which will simply create
+a new script which extends the previous script, replacing the previous ext_resource of the node.
+
+Another way of attaching a script to a node is by integrating its code into the scene's .tcsn file as sub_resource. To achieve
+this using Godot's editor, select "Make Unique" from the Inspector's context menu. 
+The script code can still be edited by using the script roll icon in the scene view, although it does not appear in the 
+FileSystem View. While editing, the script's name will be shown as <scene>.tcsn::GDScript_<id>.
 
 The programmer may also create scripts (classes) without attaching them to any node. An instance of any of these classes
 must be created using ClassName.new(). (This implies that the class has a name using the class_name keyword - unsure if an
